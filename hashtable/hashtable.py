@@ -27,7 +27,7 @@ class HashTable:
     def __init__(self, capacity):
         self.capacity = capacity
         self.buckets = [None] * capacity  # initialize empty list
-        self.items = 0
+        self.items = 0  # just a counter, starting at zero
 
     def __str__(self):
         r = ""
@@ -45,7 +45,8 @@ class HashTable:
 
         Implement this.
         """
-        return self.capacity
+        print(len(self.buckets))
+        return len(self.buckets)
 
     def get_load_factor(self):
         """
@@ -118,6 +119,10 @@ class HashTable:
             new_entry.next = self.buckets[index]
             self.buckets[index] = new_entry
 
+        self.items += 1  # increment counter by 1
+        if self.get_load_factor() > .7:
+            self.resize(self.capacity * 2)  # double the size of the list
+
     def delete(self, key):
         """
         Remove the value stored with the given key.
@@ -138,10 +143,12 @@ class HashTable:
         if current is None:
             return None
         else:
-            if prev is None:
-                self.buckets[index] = current.next
+            if prev is None:  # if we're at the head
+                self.buckets[index] = current.next  # move to the next one
             else:
                 prev.next = current.next
+
+        self.items -= 1  # decrement by 1 since we're deleting 1
 
     def get(self, key):
         """
@@ -169,7 +176,18 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        old_buckets = self.buckets
+        self.capacity = new_capacity
+        self.buckets = [None] * self.capacity
+
+        current = None  # placeholder memory
+
+        for i in old_buckets:
+            current = i
+            while current is not None:
+                self.put(current.key, current.value)
+                current = current.next  # move to the next index
+        # repopulating our hash table at new capacity with all the same stuff we had in it before
 
 
 if __name__ == "__main__":
@@ -195,11 +213,11 @@ if __name__ == "__main__":
         print(ht.get(f"line_{i}"))
 
     # Test resizing
-    # old_capacity = ht.get_num_slots()
-    # ht.resize(ht.capacity * 2)
-    # new_capacity = ht.get_num_slots()
+    old_capacity = ht.get_num_slots()
+    ht.resize(ht.capacity * 2)
+    new_capacity = ht.get_num_slots()
 
-    # print(f"\nResized from {old_capacity} to {new_capacity}.\n")
+    print(f"\nResized from {old_capacity} to {new_capacity}.\n")
 
     # Test if data intact after resizing
     for i in range(1, 13):
